@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Screen Capture Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Screen Capture Dashboard</h1>
+            <div class="connection-status" id="connectionStatus">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="connectionText">Connecting...</span>
+            </div>
+        </header>
+        
+        <main>
+            <div class="capture-status" id="captureStatus">
+                <div class="status-indicator" id="statusIndicator">
+                    <svg class="status-icon" id="statusIcon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                    </svg>
+                    <h2 id="statusText">Screen Capture Stopped</h2>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn start-btn" id="startBtn">
+                    <svg class="btn-icon" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" fill="currentColor"/>
+                    </svg>
+                    <span>START</span>
+                </button>
+                
+                <button class="control-btn stop-btn" id="stopBtn" disabled>
+                    <svg class="btn-icon" viewBox="0 0 24 24">
+                        <rect x="6" y="6" width="12" height="12" fill="currentColor"/>
+                    </svg>
+                    <span>STOP</span>
+                </button>
+                
+                <button class="control-btn capture-btn" id="captureBtn">
+                    <svg class="btn-icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <circle cx="12" cy="12" r="7" fill="currentColor"/>
+                    </svg>
+                    <span>CAPTURE NOW</span>
+                </button>
+            </div>
+            
+            <div class="status-details">
+                <p id="statusDetails">Press START to begin capturing screenshots every 30 seconds</p>
+            </div>
+            
+            <div class="info-panel">
+                <h3>Information</h3>
+                <ul>
+                    <li>Screenshots are saved to <code id="outputFolder">./screenshots/[date]/</code></li>
+                    <li>All monitors are captured in a single image</li>
+                    <li>Capture interval: <span id="captureInterval">30</span> seconds</li>
+                    <li>File format: <span id="fileFormat">PNG</span></li>
+                    <li id="qualityInfo" style="display: none;">JPEG Quality: <span id="jpegQuality">90</span>%</li>
+                </ul>
+                <p style="margin-top: 15px; font-size: 12px; color: #666;">
+                    Configure settings in <code>config.json</code>
+                </p>
+            </div>
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

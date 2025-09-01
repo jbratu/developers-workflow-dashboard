@@ -1,0 +1,32 @@
+
+# Certificates (contain private keys)
+certs/
+*.pem
+*.crt
+*.key
+*.pfx
+
+# Screenshots
+screenshots/
+
+# Generated JavaScript
+public/app.js
+
+# Deno
+deno.lock
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+config.json

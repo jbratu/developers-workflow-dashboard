@@ -1,0 +1,8 @@
+{
+  "screenshot": {
+    "format": "jpg",
+    "quality": 50,
+    "captureInterval": 30,
+    "outputFolder": "./screenshots"
+  }
+}

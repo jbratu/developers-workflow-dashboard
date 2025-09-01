@@ -1,0 +1,15 @@
+{
+  "tasks": {
+    "build": "deno bundle public/app.ts -o public/app.js",
+    "build:watch": "deno bundle --watch public/app.ts -o public/app.js",
+    "cert:generate": "powershell -ExecutionPolicy Bypass -File generate-mkcert.ps1",
+    "cert:mkcert": "powershell -ExecutionPolicy Bypass -File generate-mkcert.ps1",
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-run --allow-sys --watch server.ts",
+    "start": "deno run --allow-net --allow-read --allow-write --allow-run --allow-sys server.ts",
+    "test:https": "deno run --allow-net --allow-read test-https.ts"
+  },
+  "compilerOptions": {
+    "lib": ["deno.window", "dom"],
+    "strict": true
+  }
+}
