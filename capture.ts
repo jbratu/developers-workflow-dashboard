@@ -29,8 +29,8 @@ export class CaptureManager {
       await this.startPowerShellProcess();
     }
     
-    // Capture a screenshot immediately, regardless of timer
-    await this.captureScreenshots();
+    // Capture a screenshot immediately with special suffix
+    await this.captureScreenshots(true);
   }
   
   async start(): Promise<void> {
@@ -367,7 +367,7 @@ while ($true) {
     console.log("PowerShell process stopped");
   }
   
-  private async captureScreenshots(): Promise<void> {
+  private async captureScreenshots(isManual: boolean = false): Promise<void> {
     if (!this.writer) {
       console.error("PowerShell process not running");
       return;
@@ -383,11 +383,14 @@ while ($true) {
       
       const absoluteFolderPath = await Deno.realPath(folderPath);
       
-      console.log(`Requesting screenshot at ${timestamp}`);
+      // Add suffix for manual captures
+      const fileTimestamp = isManual ? `${timestamp}-capture-now` : timestamp;
+      
+      console.log(`Requesting screenshot at ${timestamp}${isManual ? ' (manual capture)' : ''}`);
       
       // Send capture command followed by parameters
       await this.writer.write(this.encoder.encode("capture\n"));
-      await this.writer.write(this.encoder.encode(`${timestamp}\n`));
+      await this.writer.write(this.encoder.encode(`${fileTimestamp}\n`));
       await this.writer.write(this.encoder.encode(`${absoluteFolderPath.replace(/\\/g, '/')}\n`));
       await this.writer.write(this.encoder.encode(`${this.config.screenshot.format}\n`));
       await this.writer.write(this.encoder.encode(`${this.config.screenshot.quality}\n`));
