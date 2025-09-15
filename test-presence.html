@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presence Detection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Presence Detection Testing</h1>
+    
+    <div class="test-section">
+        <h2>Test Instructions</h2>
+        <ol>
+            <li>Open the main app at <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></li>
+            <li>Click on the webcam widget to enable camera access</li>
+            <li>Toggle "Use Presence Detection" to enable the feature</li>
+            <li>Move in and out of the camera frame to test detection</li>
+            <li>Watch the console for detection events</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Behavior</h2>
+        <div class="status info">
+            <strong>When presence is detected:</strong>
+            <ul>
+                <li>Status shows "Person detected" with green indicator</li>
+                <li>If enabled, screen capture should start automatically</li>
+                <li>Console logs "Presence detected" with face count and confidence</li>
+            </ul>
+        </div>
+        <div class="status info">
+            <strong>When absence is detected (after 3 seconds):</strong>
+            <ul>
+                <li>Status shows "No person detected" with yellow indicator</li>
+                <li>If enabled, screen capture should stop automatically</li>
+                <li>Console logs "Absence detected"</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Mobile Testing</h2>
+        <p>To test on mobile device:</p>
+        <ol>
+            <li>Ensure mobile device is on same network</li>
+            <li>Open browser and navigate to: <code>http://[YOUR_IP]:8080</code></li>
+            <li>Replace [YOUR_IP] with your computer's IP address shown in server output</li>
+            <li>Grant camera permissions when prompted</li>
+        </ol>
+        <p><strong>Note:</strong> For HTTPS, use the certificate-enabled URL if available.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Troubleshooting</h2>
+        <div class="status info">
+            <strong>If webcam doesn't work:</strong>
+            <ul>
+                <li>Check browser permissions for camera access</li>
+                <li>Ensure no other app is using the camera</li>
+                <li>Try refreshing the page</li>
+                <li>Check browser console for errors</li>
+            </ul>
+        </div>
+        <div class="status info">
+            <strong>If detection is inconsistent:</strong>
+            <ul>
+                <li>Ensure good lighting conditions</li>
+                <li>Face the camera directly</li>
+                <li>Stay within 1-2 meters of camera</li>
+                <li>Check console for confidence scores</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

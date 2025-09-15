@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Screen Capture Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -48,6 +50,31 @@
                     </svg>
                     <span>CAPTURE NOW</span>
                 </button>
+            </div>
+            
+            <div class="webcam-widget">
+                <div class="webcam-container">
+                    <video id="webcamVideo" autoplay playsinline muted></video>
+                    <div class="webcam-overlay" id="webcamOverlay">
+                        <svg class="webcam-icon" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                        </svg>
+                        <span>Click to enable webcam</span>
+                    </div>
+                </div>
+                
+                <div class="presence-controls">
+                    <label class="presence-toggle">
+                        <input type="checkbox" id="presenceToggle" disabled>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Use Presence Detection</span>
+                    </label>
+                    
+                    <div class="presence-status" id="presenceStatus">
+                        <span class="presence-dot" id="presenceDot"></span>
+                        <span id="presenceText">Webcam not active</span>
+                    </div>
+                </div>
             </div>
             
             <div class="status-details">

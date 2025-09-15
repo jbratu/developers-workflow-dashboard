@@ -120,16 +120,16 @@ main {
 
 .controls {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
 .control-btn {
     flex: 1;
-    padding: 25px;
+    padding: 15px 10px;
     border: none;
-    border-radius: 15px;
-    font-size: 18px;
+    border-radius: 12px;
+    font-size: 14px;
     font-weight: bold;
     color: white;
     cursor: pointer;
@@ -137,15 +137,15 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    min-height: 100px;
+    gap: 8px;
+    min-height: 80px;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
 }
 
 .btn-icon {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
 }
 
 .start-btn {
@@ -241,23 +241,187 @@ code {
         padding: 0;
     }
     
-    .controls {
-        flex-direction: column;
+    .control-btn {
+        min-height: 70px;
+        font-size: 12px;
     }
     
-    .control-btn {
-        min-height: 80px;
+    .btn-icon {
+        width: 28px;
+        height: 28px;
     }
 }
 
 @media (hover: none) and (pointer: coarse) {
     .control-btn {
-        min-height: 120px;
-        font-size: 20px;
+        min-height: 90px;
+        font-size: 16px;
     }
     
     .btn-icon {
-        width: 48px;
-        height: 48px;
+        width: 36px;
+        height: 36px;
+    }
+}
+
+.webcam-widget {
+    margin: 20px 0;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.webcam-container {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 15px;
+    background: #1f2937;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 4/3;
+}
+
+#webcamVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.webcam-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(31, 41, 55, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    color: white;
+    gap: 10px;
+}
+
+.webcam-overlay:hover {
+    background: rgba(31, 41, 55, 0.85);
+}
+
+.webcam-icon {
+    width: 48px;
+    height: 48px;
+    color: #60a5fa;
+}
+
+.webcam-overlay span {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.presence-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.presence-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.presence-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 48px;
+    height: 24px;
+    background: #cbd5e1;
+    border-radius: 12px;
+    transition: background 0.3s ease;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.presence-toggle input:checked + .toggle-slider {
+    background: #667eea;
+}
+
+.presence-toggle input:checked + .toggle-slider::before {
+    transform: translateX(24px);
+}
+
+.presence-toggle input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.toggle-label {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.presence-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+.presence-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #94a3b8;
+    transition: background 0.3s ease;
+}
+
+.presence-dot.present {
+    background: #4ade80;
+    animation: pulse 2s infinite;
+}
+
+.presence-dot.absent {
+    background: #fbbf24;
+}
+
+.presence-dot.inactive {
+    background: #94a3b8;
+}
+
+@media (max-width: 480px) {
+    .webcam-container {
+        max-width: 100%;
+    }
+    
+    .presence-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .presence-toggle {
+        justify-content: space-between;
     }
 }

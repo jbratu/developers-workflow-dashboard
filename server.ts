@@ -50,7 +50,8 @@ async function handler(req: Request): Promise<Response> {
                 type: "status",
                 isRunning: true,
               }));
-              console.log("Screen capture started");
+              const reason = data.reason ? ` (${data.reason})` : "";
+              console.log(`Screen capture started${reason}`);
             }
             break;
             
@@ -61,7 +62,8 @@ async function handler(req: Request): Promise<Response> {
                 type: "status",
                 isRunning: false,
               }));
-              console.log("Screen capture stopped");
+              const reason = data.reason ? ` (${data.reason})` : "";
+              console.log(`Screen capture stopped${reason}`);
             }
             break;
             

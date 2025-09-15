@@ -1,3 +1,5 @@
+import { PresenceDetector } from './presence-detector.js';
+
 interface StatusMessage {
   type: string;
   isRunning: boolean;
@@ -8,6 +10,9 @@ class ScreenCaptureClient {
   private reconnectTimeout: number | null = null;
   private reconnectDelay = 1000;
   private maxReconnectDelay = 30000;
+  private presenceDetector: PresenceDetector | null = null;
+  private isPresenceEnabled = false;
+  private webcamInitialized = false;
   
   private elements = {
     connectionStatus: document.getElementById('connectionStatus') as HTMLElement,
@@ -19,10 +24,18 @@ class ScreenCaptureClient {
     statusDetails: document.getElementById('statusDetails') as HTMLElement,
     startBtn: document.getElementById('startBtn') as HTMLButtonElement,
     stopBtn: document.getElementById('stopBtn') as HTMLButtonElement,
+    captureBtn: document.getElementById('captureBtn') as HTMLButtonElement,
+    webcamVideo: document.getElementById('webcamVideo') as HTMLVideoElement,
+    webcamOverlay: document.getElementById('webcamOverlay') as HTMLElement,
+    presenceToggle: document.getElementById('presenceToggle') as HTMLInputElement,
+    presenceStatus: document.getElementById('presenceStatus') as HTMLElement,
+    presenceDot: document.getElementById('presenceDot') as HTMLElement,
+    presenceText: document.getElementById('presenceText') as HTMLElement,
   };
   
   constructor() {
     this.initializeEventListeners();
+    this.initializeWebcam();
     this.connect();
   }
   
@@ -33,6 +46,18 @@ class ScreenCaptureClient {
     
     this.elements.stopBtn.addEventListener('click', () => {
       this.sendCommand('stop');
+    });
+    
+    this.elements.captureBtn.addEventListener('click', () => {
+      this.sendCommand('capture-now');
+    });
+    
+    this.elements.webcamOverlay.addEventListener('click', () => {
+      this.startWebcam();
+    });
+    
+    this.elements.presenceToggle.addEventListener('change', () => {
+      this.togglePresenceDetection();
     });
   }
   
@@ -101,9 +126,17 @@ class ScreenCaptureClient {
     this.elements.stopBtn.disabled = true;
   }
   
-  private handleMessage(data: StatusMessage): void {
-    if (data.type === 'status') {
-      this.updateStatus(data.isRunning);
+  private handleMessage(data: any): void {
+    switch (data.type) {
+      case 'status':
+        this.updateStatus(data.isRunning);
+        break;
+      case 'config':
+        this.updateConfig(data.config);
+        break;
+      case 'capture-complete':
+        console.log('Screenshot captured:', data.message);
+        break;
     }
   }
   
@@ -123,11 +156,111 @@ class ScreenCaptureClient {
     }
   }
   
-  private sendCommand(type: string): void {
+  private sendCommand(type: string, metadata?: any): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type }));
+      const message = metadata ? { type, ...metadata } : { type };
+      this.ws.send(JSON.stringify(message));
     } else {
       console.error('WebSocket is not connected');
+    }
+  }
+  
+  private initializeWebcam(): void {
+    this.elements.webcamVideo.style.display = 'none';
+  }
+  
+  private async startWebcam(): Promise<void> {
+    if (this.webcamInitialized) return;
+    
+    try {
+      this.elements.webcamOverlay.style.display = 'none';
+      this.elements.webcamVideo.style.display = 'block';
+      
+      this.presenceDetector = new PresenceDetector({
+        detectionInterval: 1000,
+        absenceThreshold: 3,
+        presenceThreshold: 1,
+        minConfidence: 0.7
+      });
+      
+      await this.presenceDetector.initialize(this.elements.webcamVideo);
+      
+      this.presenceDetector.addEventListener('presenceDetected', (event: any) => {
+        console.log('Presence detected:', event.detail);
+        this.updatePresenceStatus(true);
+        
+        if (this.isPresenceEnabled) {
+          this.sendCommand('start', { reason: 'presence_detected' });
+        }
+      });
+      
+      this.presenceDetector.addEventListener('absenceDetected', () => {
+        console.log('Absence detected');
+        this.updatePresenceStatus(false);
+        
+        if (this.isPresenceEnabled) {
+          this.sendCommand('stop', { reason: 'absence_detected' });
+        }
+      });
+      
+      this.presenceDetector.addEventListener('error', (event: any) => {
+        console.error('Presence detector error:', event.detail);
+      });
+      
+      this.webcamInitialized = true;
+      this.elements.presenceToggle.disabled = false;
+      this.updatePresenceStatus(false);
+      
+    } catch (error) {
+      console.error('Failed to start webcam:', error);
+      alert('Failed to access webcam. Please ensure camera permissions are granted.');
+      this.elements.webcamOverlay.style.display = 'flex';
+      this.elements.webcamVideo.style.display = 'none';
+    }
+  }
+  
+  private togglePresenceDetection(): void {
+    this.isPresenceEnabled = this.elements.presenceToggle.checked;
+    
+    if (this.isPresenceEnabled && this.presenceDetector) {
+      this.presenceDetector.start();
+      console.log('Presence detection enabled');
+    } else if (this.presenceDetector) {
+      this.presenceDetector.stop();
+      console.log('Presence detection disabled');
+    }
+  }
+  
+  private updatePresenceStatus(isPresent: boolean): void {
+    if (!this.webcamInitialized) {
+      this.elements.presenceDot.className = 'presence-dot inactive';
+      this.elements.presenceText.textContent = 'Webcam not active';
+      return;
+    }
+    
+    if (isPresent) {
+      this.elements.presenceDot.className = 'presence-dot present';
+      this.elements.presenceText.textContent = 'Person detected';
+    } else {
+      this.elements.presenceDot.className = 'presence-dot absent';
+      this.elements.presenceText.textContent = 'No person detected';
+    }
+  }
+  
+  private updateConfig(config: any): void {
+    const outputFolder = document.getElementById('outputFolder');
+    const captureInterval = document.getElementById('captureInterval');
+    const fileFormat = document.getElementById('fileFormat');
+    const qualityInfo = document.getElementById('qualityInfo') as HTMLElement;
+    const jpegQuality = document.getElementById('jpegQuality');
+    
+    if (outputFolder) outputFolder.textContent = config.outputFolder || './screenshots/[date]/';
+    if (captureInterval) captureInterval.textContent = config.captureInterval || '30';
+    if (fileFormat) fileFormat.textContent = (config.format || 'png').toUpperCase();
+    
+    if (config.format === 'jpg' || config.format === 'jpeg') {
+      if (qualityInfo) qualityInfo.style.display = 'block';
+      if (jpegQuality) jpegQuality.textContent = config.quality || '90';
     }
   }
 }
