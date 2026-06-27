@@ -275,6 +275,7 @@ code {
     position: relative;
     width: 100%;
     max-width: 320px;
+    overflow: hidden;
     margin: 0 auto 15px;
     background: #1f2937;
     border-radius: 8px;
@@ -414,14 +415,23 @@ code {
     .webcam-container {
         max-width: 100%;
     }
-    
+
     .presence-controls {
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
     }
-    
+
     .presence-toggle {
         justify-content: space-between;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
     }
 }

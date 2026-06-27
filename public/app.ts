@@ -171,51 +171,74 @@ class ScreenCaptureClient {
   
   private async startWebcam(): Promise<void> {
     if (this.webcamInitialized) return;
-    
+
+    // Store original overlay content for restoration on error
+    const originalOverlayContent = this.elements.webcamOverlay.innerHTML;
+
+    // Show loading state - keep overlay visible but update content
+    this.elements.webcamOverlay.innerHTML = `
+      <svg class="webcam-icon" viewBox="0 0 24 24" style="animation: spin 1s linear infinite;">
+        <path d="M12 4V2A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8z" fill="currentColor"/>
+      </svg>
+      <span>Initializing camera...</span>
+    `;
+
+    this.presenceDetector = new PresenceDetector({
+      detectionInterval: 1500,    // Check every 1.5s instead of 1s
+      absenceThreshold: 5,        // Require 5 consecutive absences (~7.5s) before triggering
+      presenceThreshold: 3,       // Require 3 consecutive detections (~4.5s) before triggering
+      minConfidence: 0.1          // Very tolerant - any movement counts as presence
+    });
+
+    // Set up event listeners before initialization
+    this.presenceDetector.addEventListener('presenceDetected', (event: any) => {
+      console.log('Presence detected:', event.detail);
+      this.updatePresenceStatus(true);
+
+      if (this.isPresenceEnabled) {
+        this.sendCommand('start', { reason: 'presence_detected' });
+      }
+    });
+
+    this.presenceDetector.addEventListener('absenceDetected', () => {
+      console.log('Absence detected');
+      this.updatePresenceStatus(false);
+
+      if (this.isPresenceEnabled) {
+        this.sendCommand('stop', { reason: 'absence_detected' });
+      }
+    });
+
+    this.presenceDetector.addEventListener('error', (event: any) => {
+      console.error('Presence detector error:', event.detail);
+    });
+
     try {
+      await this.presenceDetector.initialize(this.elements.webcamVideo);
+
+      // Success - now show the video
       this.elements.webcamOverlay.style.display = 'none';
       this.elements.webcamVideo.style.display = 'block';
-      
-      this.presenceDetector = new PresenceDetector({
-        detectionInterval: 1000,
-        absenceThreshold: 3,
-        presenceThreshold: 1,
-        minConfidence: 0.7
-      });
-      
-      await this.presenceDetector.initialize(this.elements.webcamVideo);
-      
-      this.presenceDetector.addEventListener('presenceDetected', (event: any) => {
-        console.log('Presence detected:', event.detail);
-        this.updatePresenceStatus(true);
-        
-        if (this.isPresenceEnabled) {
-          this.sendCommand('start', { reason: 'presence_detected' });
-        }
-      });
-      
-      this.presenceDetector.addEventListener('absenceDetected', () => {
-        console.log('Absence detected');
-        this.updatePresenceStatus(false);
-        
-        if (this.isPresenceEnabled) {
-          this.sendCommand('stop', { reason: 'absence_detected' });
-        }
-      });
-      
-      this.presenceDetector.addEventListener('error', (event: any) => {
-        console.error('Presence detector error:', event.detail);
-      });
-      
       this.webcamInitialized = true;
       this.elements.presenceToggle.disabled = false;
       this.updatePresenceStatus(false);
-      
+
     } catch (error) {
       console.error('Failed to start webcam:', error);
-      alert('Failed to access webcam. Please ensure camera permissions are granted.');
+
+      // Restore overlay with error state
+      this.elements.webcamOverlay.innerHTML = `
+        <svg class="webcam-icon" viewBox="0 0 24 24" style="color: #ef4444;">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+        </svg>
+        <span style="color: #ef4444;">Camera initialization failed</span>
+        <span style="font-size: 12px; opacity: 0.7;">Click to retry</span>
+      `;
       this.elements.webcamOverlay.style.display = 'flex';
       this.elements.webcamVideo.style.display = 'none';
+
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`Failed to access webcam: ${errorMessage}\n\nPlease ensure camera permissions are granted and try again.`);
     }
   }
   
